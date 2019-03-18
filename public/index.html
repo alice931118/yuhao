@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <!-- <link href='fonts/PingFang SC Regular.css'  rel=stylesheet> -->
+    <link href='fonts/liquid_crystal.css'  rel=stylesheet>
+    <title>enterprise-search-app</title>
+    <script>
+      var iScale = 1;
+
+      document.write('<meta name="viewport" content="width=device-width,initial-scale=' + iScale + ',minimum-scale=' + iScale + ',maximum-scale=' + iScale + ',user-scalable=no" />');
+      var iWidth = document.documentElement.clientWidth;
+      document.getElementsByTagName('html')[0].style.fontSize = 10 * iWidth / 75 + 'px';
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but enterprise-search-app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
+<style>
+  html, body, #app{
+      height: 100%;
+  }
+  body {
+    background-color: #fff;
+    overflow: initial!important;
+    padding-right: 0 !important;
+  }
+  * {
+    box-sizing: border-box; 
+    padding: 0;
+    margin: 0;
+    font-family: "PingFang SC Regular", Helvetica, 'Avenir',"Microsoft Yahei",Arial, sans-serif;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+  }
+  input {
+    -webkit-user-select:text !important;
+    -moz-user-select:text !important;
+    -ms-user-select:text !important;
+    user-select:text !important;
+  }
+  .canchoose{
+    -webkit-user-select:text !important;
+    -moz-user-select:text !important;
+    -ms-user-select:text !important;
+    user-select:text !important;
+  }
+  
+  p {
+    margin: 0;
+  }
+  
+  ul, ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .icon {
+    display: inline-block;
+  }
+  
+  .clearfix:after {  visibility: hidden;  display: block;  font-size: 0;  content: " ";  clear: both;  height: 0;  }
+  
+  .left {
+    float: left;
+  }
+  .right {
+    float: right;
+  }
+  input {
+    background:inherit;
+    outline: none;
+  }
+  
+  .liquidfont {
+    font-family: 'liquid_crystal', Helvetica, 'Avenir', Arial, sans-serif;
+  }
+  .topBlock img{
+    display: inline-block;
+  }
+  .boldFont {
+    font-weight: 600;
+  }
+  .lightColor {
+    color: rgba(255,255,255,0.80);
+  }
+  a,a:hover {
+    color: #2BF094;
+  }
+  .ellispsis {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  
+  
+  /* 按钮点击色 */
+  .primaryBtn:active {
+    background-color:#AD9019!important;
+  }
+  .blueBtn:active {
+    background-color:#5D88C6!important;
+  }
+  .blackBtn:active {
+    background-color:#53555F!important;
+  }
+  </style>
