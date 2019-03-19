@@ -75,7 +75,7 @@ export default {
     data(){
         return{
             isOperating: false,
-            isShowMessageDetail: true,
+            isShowMessageDetail: false,
             searchValue: '',
             pageInfo:{
                 total: 50,
