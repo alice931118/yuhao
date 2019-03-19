@@ -6,7 +6,6 @@
 
 
 <script>
-import network from '@/utils/network';
 import utils from '@/utils/utils'
 
 export default {
