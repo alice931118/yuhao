@@ -18,7 +18,7 @@
                 <div class="left" v-if="!isOperating">
                     <p class="tip">Showing 12 results</p>
                     <div class="lists-wrap">
-                        <div class="list-big-item" v-for="(messageItem, messageIndex) in messageList" :key="messageIndex">
+                        <div class="list-big-item" v-for="(messageItem, messageIndex) in messageList" :key="messageIndex" @click="goSeeDetails(messageItem)">
                             <div class="message-left">
                                 <img src="../assets/img/message-image.jpg" alt="">
                             </div>
@@ -67,6 +67,7 @@
 
 <script>
 import('../assets/css/list.css');
+import utils from '@/utils/utils';
 
 export default {
     components: {
@@ -89,6 +90,8 @@ export default {
     },
     mounted(){
         this.searchValue = this.$store.state.searchValue;
+
+        this.handleParams();
     },
     methods:{
         goSearch(){
@@ -99,10 +102,18 @@ export default {
         },
 
         changePageNo(){},
-
+        goSeeDetails(item){
+            this.isShowMessageDetail = true;
+        },
         closeDetail(val){
             this.isShowMessageDetail = val;
-        }
+        },
+
+        handleParams(){
+            let myString = '((P1 | P2) | P3) | ((O1 & O2) & O3)'.replace(/\s+/g,"");
+            let myOutput = '';
+            console.log(utils.ShuntingYard(myString, myOutput))
+        },
     }
 }
 </script>
