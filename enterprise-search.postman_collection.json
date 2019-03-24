@@ -1,0 +1,220 @@
+{
+	"info": {
+		"_postman_id": "0b6c0d94-9279-4855-a32c-d11077b9069a",
+		"name": "enterprise-search",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "search(without facets)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"metadata\": [\r\n    {\r\n      \"value\": \"Pernod CEO pursues change\",\r\n      \"class\": \"keyword\"\r\n    }\r\n  ]\r\n}"
+				},
+				"url": {
+					"raw": "http://35.198.235.4:8080/search-api/v1/api/search",
+					"protocol": "http",
+					"host": [
+						"35",
+						"198",
+						"235",
+						"4"
+					],
+					"port": "8080",
+					"path": [
+						"search-api",
+						"v1",
+						"api",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search(with facets)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"metadata\": [\r\n    {\r\n      \"value\": \"Pernod CEO pursues change\",\r\n      \"class\": \"keyword\"\r\n    }\r\n  ],\r\n  \"facets\":[\r\n\t\"person\",\r\n\t\"org\"\r\n  ]\r\n}"
+				},
+				"url": {
+					"raw": "http://35.198.235.4:8080/search-api/v1/api/search",
+					"protocol": "http",
+					"host": [
+						"35",
+						"198",
+						"235",
+						"4"
+					],
+					"port": "8080",
+					"path": [
+						"search-api",
+						"v1",
+						"api",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search(with pagination)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"metadata\": [\r\n    {\r\n      \"value\": \"Pernod CEO pursues change\",\r\n      \"class\": \"keyword\"\r\n    }\r\n  ],\r\n  \"limit\": 10,\r\n  \"page\": 0\r\n}"
+				},
+				"url": {
+					"raw": "http://35.198.235.4:8080/search-api/v1/api/search",
+					"protocol": "http",
+					"host": [
+						"35",
+						"198",
+						"235",
+						"4"
+					],
+					"port": "8080",
+					"path": [
+						"search-api",
+						"v1",
+						"api",
+						"search"
+					]
+				},
+				"description": "result = {page * limit ~ page * limit + limit - 1} \npage 0 limit 10 = {0 ~ 9}\npage 1 limit 20 = (20 ~ 39)"
+			},
+			"response": []
+		},
+		{
+			"name": "search(multiple classes 2)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"metadata\": [\r\n    {\r\n      \"value\": \"Pernod CEO pursues change\",\r\n      \"class\": \"keyword\"\r\n    },{\r\n    \t\"value\": \"Pernod Ricard\",\r\n    \t\"class\": \"org\"\r\n    },{\r\n    \t\"op\": 1\r\n    }\r\n  ]\r\n}"
+				},
+				"url": {
+					"raw": "http://35.198.235.4:8080/search-api/v1/api/search",
+					"protocol": "http",
+					"host": [
+						"35",
+						"198",
+						"235",
+						"4"
+					],
+					"port": "8080",
+					"path": [
+						"search-api",
+						"v1",
+						"api",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search(multiple classes 3)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"metadata\": [\r\n    {\r\n      \"value\": \"Pernod CEO pursues change\",\r\n      \"class\": \"keyword\"\r\n    },{\r\n    \t\"value\": \"Pernod Ricard\",\r\n    \t\"class\": \"org\"\r\n    },{\r\n    \t\"op\": 1\r\n    },{\r\n    \t\"value\": \"Alexandre Ricard\",\r\n    \t\"class\": \"person\"\r\n    },{\r\n    \t\"op\": 1\r\n    }\r\n  ]\r\n}"
+				},
+				"url": {
+					"raw": "http://35.198.235.4:8080/search-api/v1/api/search",
+					"protocol": "http",
+					"host": [
+						"35",
+						"198",
+						"235",
+						"4"
+					],
+					"port": "8080",
+					"path": [
+						"search-api",
+						"v1",
+						"api",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "suggestions",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"keyword\": \"Champ bail\",\r\n  \"limit\": 5\r\n}"
+				},
+				"url": {
+					"raw": "http://35.198.235.4:8080/search-api/v1/api/suggestions",
+					"protocol": "http",
+					"host": [
+						"35",
+						"198",
+						"235",
+						"4"
+					],
+					"port": "8080",
+					"path": [
+						"search-api",
+						"v1",
+						"api",
+						"suggestions"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
