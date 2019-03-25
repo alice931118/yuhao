@@ -55,4 +55,23 @@ img{
 .h1, .h2, .h3, .h4, .h5, .h6 {
     color: #2e2e2e !important;
 }
+
+.search-suggestion{
+    position: absolute;
+    left: 20px;
+    top: 42px;
+    width: 90%;
+    text-align: left;
+    background: #fff;
+    padding: 10px 0;
+    box-shadow: 0 4px 6px 0 rgba(32,33,36,0.28);
+  }
+.search-suggestion-item{
+    font-size: 14px;
+    line-height: 22px;
+    padding: 0 20px;
+  }
+.search-suggestion-item:hover{
+    background: #eee;
+  }
 </style>

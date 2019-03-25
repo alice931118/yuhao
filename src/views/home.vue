@@ -21,7 +21,6 @@ import('../assets/css/home.css');
 export default {
   components: {
       myHeader: require('@/views/header').default,
-      // tobetFooter: require('@/views/footer').default,
   },
   data(){
     return{
@@ -43,36 +42,24 @@ export default {
       this.goSearch(item);
     },
 
+    // 关键词建议列表
     querySuggestions(){
         if(this.searchValue == ""){
             this.suggestionList = [];
         }else{
-        // let params = {
-        //   "workspaceIds": [],
-        //   "type": "",
-        //   "keyword": this.searchValue,
-        //   "limit": 8
-        // }
-        // this.$axios.post('/suggestions', params).then(res=>{
-        //     if(res.data.code != 200) {
-        //         this.$Message.warning(res.data.message)
-        //     }else{
-        //         this.suggestionList = res.data.results;
-                  this.suggestionList = ['哈哈','哈哈','哈哈','哈哈','哈哈','哈哈','哈哈','哈哈'];
-        //     }
-        // })
+        let params = {
+          "keyword": this.searchValue,
+          "limit": 5
+        }
+        this.$axios.post('search-api/v1/api/suggestions', params).then(res=>{
+            if(res.status != 200) {
+                // this.$Message.warning(res.statusText)
+            }else{
+                this.suggestionList = res.data.results;
+            }
+        })
         }
     },
-
-    // queryExchangeUser(){
-    //     this.$axios.post('/exchangeUser/queryExchangeUser?userId=13').then(res=>{
-    //         if(res.data.status != 0) {
-    //             this.$Message.warning(res.data.message)
-    //         }else{
-                
-    //         }
-    //     })
-    // },
   }
 }
 </script>

@@ -9,7 +9,7 @@ constant.url = urlParams;
 
 
 axios.defaults.baseURL = urlParams.baseUrl;
-
+console.log(axios.defaults.baseURL)
 
 axios.defaults.withCredentials = true;
 axios.defaults.timeout = 30000;
@@ -29,7 +29,7 @@ axios.interceptors.request.use(
     config => {
       config.data = JSON.stringify(config.data);
       config.headers = {
-        'Content-Type':'application/x-www-form-urlencoded'
+        'Content-Type':'application/json' //application/x-www-form-urlencoded
       }
       // ------------------------------------------------------------------------------------
       removePending(config); //在一个ajax发送前执行一下取消操作

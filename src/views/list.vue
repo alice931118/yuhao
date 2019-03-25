@@ -1,14 +1,17 @@
 <template>
-    <div class="list-page">
+    <div class="list-page" @click="suggestionList=[]">
         <div class="messageList" v-show="!isShowMessageDetail">
             <div class="list-header">
                 <div class="left">
                     <Icon class="icon" type="ios-ionitron-outline" size="24" />
                     <div class="logo">Enterprise-search</div>
                 </div>
-                <div class="searchBox-wrap">
+                <div class="searchBox-wrap" @click.stop="1">
                     <div class="searchBox">
-                        <Input v-model="searchValue"  icon="ios-search-outline" @on-enter="goSearch()"/>
+                        <Input v-model="searchValue" icon="ios-search-outline" @on-enter="goSearch()" @input="querySuggestions"/>
+                        <div class="search-suggestion" v-if="suggestionList.length > 0">
+                            <div class="search-suggestion-item" v-for="(item,index) in suggestionList" :key="index" @click.stop="selectSuggestion(item)">{{item}}</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -83,6 +86,7 @@ export default {
                 pageNo: 1,
                 pageSize: 20,
             },
+            suggestionList: [],
             messageList: [1,2,3,4,5,6,7,8,9,10],
             filterList: [{type:'Data Resource', list:[{ischecked: false},{ischecked: false},{ischecked: false}]},
             {type:'Entities', list:[{ischecked: false},{ischecked: true},{ischecked: false},{ischecked: false}]}]
@@ -91,10 +95,34 @@ export default {
     mounted(){
         this.searchValue = this.$store.state.searchValue;
 
-        this.handleParams();
+        // this.handleParams();
     },
     methods:{
-        goSearch(){
+        // 关键词建议列表
+        querySuggestions(){
+            if(this.searchValue == ""){
+                this.suggestionList = [];
+            }else{
+            let params = {
+            "keyword": this.searchValue,
+            "limit": 5
+            }
+            this.$axios.post('search-api/v1/api/suggestions', params).then(res=>{
+                if(res.status != 200) {
+                    // this.$Message.warning(res.statusText)
+                }else{
+                    this.suggestionList = res.data.results;
+                }
+            })
+            }
+        },
+        selectSuggestion(item){
+            this.goSearch(item);
+        },
+
+        goSearch(value){
+            if(value) this.searchValue = value;
+            this.suggestionList = [];
             console.log(111);
         },
         toggleFilter(typeIndex, filterIndex){

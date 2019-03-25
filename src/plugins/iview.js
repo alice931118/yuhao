@@ -28,4 +28,4 @@ Vue.component('DatePicker', DatePicker);
  
 
 
-Vue.prototype.$message = Message;
+Vue.prototype.$Message = Message;

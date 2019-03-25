@@ -44,21 +44,3 @@
     border: 1px solid #ccc;
   }
 
-  .home-page .search-suggestion{
-    position: absolute;
-    left: 20px;
-    top: 42px;
-    width: 90%;
-    text-align: left;
-    background: #fff;
-    padding: 10px 0;
-    box-shadow: 0 4px 6px 0 rgba(32,33,36,0.28);
-  }
-  .home-page .search-suggestion-item{
-    font-size: 14px;
-    line-height: 22px;
-    padding: 0 20px;
-  }
-  .home-page .search-suggestion-item:hover{
-    background: #eee;
-  }
