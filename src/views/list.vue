@@ -110,9 +110,13 @@ export default {
         },
 
         handleParams(){
-            let myString = '((P1 | P2) | P3) | ((O1 & O2) & O3)'.replace(/\s+/g,"");
+            // let myString = 'O1 & O2 & O3'.replace(/\s+/g,"");
+            let myString = '{ "name" : "1", "id": 1} & { "name" : "2"} & { "name" : "3"}'.replace(/\s+/g,"");
             let myOutput = '';
-            console.log(utils.ShuntingYard(myString, myOutput))
+            myOutput = utils.ShuntingYard(myString, myOutput);
+            myOutput = '['+myOutput.replace(/\&/g,'{ "option": 1 }').replace(/\s+/g,"").replace(/\}\{/g,'},{') + ']';
+            myOutput = JSON.parse(myOutput)
+            console.log(myOutput);
         },
     }
 }
