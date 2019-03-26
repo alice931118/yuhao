@@ -19,7 +19,7 @@
             <div class="list-page-content clearfix">
                 <!-- 列表 -->
                 <div class="left" v-if="!isOperating">
-                    <p class="tip">Showing 12 results</p>
+                    <p class="tip">Showing {{pageInfo.total}} results (took {{tookTime}}s)</p>
                     <div class="lists-wrap">
                         <div class="list-big-item" v-for="(messageItem, messageIndex) in messageList" :key="messageIndex" @click="goSeeDetails(messageItem)">
                             <div class="message-left">
@@ -37,7 +37,7 @@
                             </div>
                         </div>
                     </div>
-                    <Page :total="pageInfo.total" :page-size="pageInfo.pageSize" :show-total="false" @on-change="changePageNo" class-name="pageBox"/>
+                    <Page v-if="pageInfo.total > pageInfo.pageSize" :total="pageInfo.total" :page-size="pageInfo.pageSize" :show-total="false" @on-change="changePageNo" class-name="pageBox"/>
                 </div>
                 <div class="left" v-else>
                     <div class="loading">
@@ -52,10 +52,10 @@
                         <li class="filter-type" v-for="(filterItem, filterIndex) in filterList" :key="filterIndex">
                             <div class="filter-type-title">{{filterItem.type}}</div>
                             <ul class="filter-list">
-                                <li class="filter-list-item clearfix" v-for="(item,index) in filterItem.list" :key="index" @click="toggleFilter(filterIndex, index)">
+                                <li class="filter-list-item clearfix" v-for="(item,index) in filterItem.list" :key="index" @click="toggleFilter(filterIndex, index)" v-show="index<10">
                                     <div class="icon left" :class="item.ischecked?'checked':''"></div>
-                                    <div class="text left">BBC</div>
-                                    <div class="num right">20</div>
+                                    <div class="text left">{{item.name}}</div>
+                                    <!-- <div class="num right">20</div> -->
                                 </li>
                             </ul>
                         </li>
@@ -82,14 +82,14 @@ export default {
             isShowMessageDetail: false,
             searchValue: '',
             pageInfo:{
-                total: 50,
+                total: 0,
                 pageNo: 1,
-                pageSize: 20,
+                pageSize: 10,
             },
+            tookTime: 0,
             suggestionList: [],
-            messageList: [1,2,3,4,5,6,7,8,9,10],
-            filterList: [{type:'Data Resource', list:[{ischecked: false},{ischecked: false},{ischecked: false}]},
-            {type:'Entities', list:[{ischecked: false},{ischecked: true},{ischecked: false},{ischecked: false}]}]
+            messageList: [],
+            filterList: [],
         }
     },
     mounted(){
@@ -103,17 +103,17 @@ export default {
             if(this.searchValue == ""){
                 this.suggestionList = [];
             }else{
-            let params = {
-            "keyword": this.searchValue,
-            "limit": 5
-            }
-            this.$axios.post('search-api/v1/api/suggestions', params).then(res=>{
-                if(res.status != 200) {
-                    // this.$Message.warning(res.statusText)
-                }else{
-                    this.suggestionList = res.data.results;
+                let params = {
+                    "keyword": this.searchValue,
+                    "limit": 5
                 }
-            })
+                this.$axios.post('search-api/v1/api/suggestions', params).then(res=>{
+                    if(res.status != 200) {
+                        // this.$Message.warning(res.statusText)
+                    }else{
+                        this.suggestionList = res.data.results;
+                    }
+                })
             }
         },
         selectSuggestion(item){
@@ -123,13 +123,79 @@ export default {
         goSearch(value){
             if(value) this.searchValue = value;
             this.suggestionList = [];
-            console.log(111);
-        },
-        toggleFilter(typeIndex, filterIndex){
-            this.filterList[typeIndex].list[filterIndex].ischecked = !this.filterList[typeIndex].list[filterIndex].ischecked;
+            this.searchFacets();
         },
 
-        changePageNo(){},
+        searchFacets(){
+            this.isOperating = true;
+            let params = {
+                "metadata": [{ "value": this.searchValue, "class": "keyword"}],
+                "facets": ["person","org"]
+            }
+            this.$axios.post('search-api/v1/api/search', params).then(res=>{
+                
+                if(res.status != 200) {
+                    // this.$Message.warning(res.statusText)
+                    this.isOperating = false;
+                }else{
+                    this.filterList = [];
+                    for(let facetsListItem in res.data.facets){
+                        let _facetsItem = [];
+                        
+                        res.data.facets[facetsListItem].forEach((item,index) => {
+                            if(index<10){
+                                _facetsItem.push({
+                                    name: item,
+                                    ischecked: false
+                                })
+                            }
+                        })
+                        this.filterList.push({type:facetsListItem, list:_facetsItem})
+                    }
+                    console.log(this.filterList);
+                    this.searchWithoutFacets();
+                }
+            })
+        },
+        searchWithoutFacets(){
+            let params = {
+                "metadata": [{ "value": this.searchValue, "class": "keyword"}],
+                "limit": this.pageInfo.pageSize,
+                "page": this.pageInfo.pageNo - 1,
+            }
+            // [{
+            // "value": "Pernod CEO pursues change",
+            // "class": "keyword"
+            // },{
+            //     "value": "Pernod Ricard",
+            //     "class": "org"
+            // },{
+            //     "op": 1
+            // }]
+            this.$axios.post('search-api/v1/api/search', params).then(res=>{
+                
+                if(res.status != 200) {
+                    this.$Message.warning(res.statusText);
+                    this.isOperating = false;
+                }else{
+                    this.tookTime = Number(res.data.took) / 1000;
+                    this.pageInfo.total = res.data.total;
+                    this.messageList = res.data.results;
+                    this.isOperating = false;
+                    console.log(this.messageList);
+                }
+            })
+        },
+
+        toggleFilter(typeIndex, filterIndex){
+            let _ischecked = this.filterList[typeIndex].list[filterIndex].ischecked;
+            this.filterList[typeIndex].list[filterIndex].ischecked = _ischecked ? !_ischecked : true;
+        },
+
+        changePageNo(pageNo){
+            this.pageInfo.pageNo = pageNo;
+            this.searchWithoutFacets();
+        },
         goSeeDetails(item){
             this.isShowMessageDetail = true;
         },

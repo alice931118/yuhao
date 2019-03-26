@@ -9,7 +9,7 @@ constant.url = urlParams;
 
 
 axios.defaults.baseURL = urlParams.baseUrl;
-console.log(axios.defaults.baseURL)
+// console.log(axios.defaults.baseURL)
 
 axios.defaults.withCredentials = true;
 axios.defaults.timeout = 30000;
@@ -41,13 +41,13 @@ axios.interceptors.request.use(
       return config;
     },
     error => {
-      return Promise.reject(err);
+      return Promise.reject(error);
     }
 );
 //http response 拦截器
 axios.interceptors.response.use(
     response => {
-      console.log(response);
+      // console.log(response);
       // ------------------------------------------------------------------------------------------
       removePending(response.config);  //在一个ajax响应后再执行一下取消操作，把已经完成的请求从pending中移除
       // -------------------------------------------------------------------------------------------

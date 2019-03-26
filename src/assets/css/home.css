@@ -3,7 +3,7 @@
     height: 100%;
   }
   .home-page .search-wrap{
-    width: 1200px;
+    max-width: 1200px;
     padding: 240px 0 0;
     margin: 0 auto;
   }
