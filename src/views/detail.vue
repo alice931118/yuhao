@@ -9,19 +9,15 @@
         <div class="detail-content-wrap">
             <div class="detail-content">
                 <div class="tip">
-                    <p class="time canchoose">Feb 19, 2019 | 1010</p>
-                    <p class="from canchoose">ABS CBN News</p>
+                    <p class="time canchoose">{{formatTime(chosenMessage.nativeCreatedAt)}}</p>
+                    <p class="from canchoose">{{chosenMessage.datasourceName}}</p>
                 </div>
-                <h1>Facebook @ 15: Takeaways For Entrepreneurs</h1>
-                <div class="img">
-                    <img src="../assets/img/message-image.jpg" alt="">
+                <h1>{{chosenMessage.title}}</h1>
+                <div class="img" v-if="chosenMessage.attachment.image[0]">
+                    <img :src="chosenMessage.attachment.image[0].url" alt="">
                 </div>
                 <div class="text">
-                    The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage.The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage. 
-                    The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage.The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage.
-                    The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage.The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage. 
-                    The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage.The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage.
-                    The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage.The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage.
+                    {{chosenMessage.content}}
                 </div>
             </div>
         </div>
@@ -30,9 +26,11 @@
 
 <script>
 import('../assets/css/detail.css');
+import utils from '@/utils/utils';
 
 export default {
     name: 'detail',
+    props:['chosenMessage'],
     data(){
         return{
 
@@ -42,7 +40,17 @@ export default {
         goBack(){
             console.log(32)
             this.$emit('closeDetail',false)
-        }
+        },
+
+        formatTime(seconds){
+            let _date = new Date(seconds);
+            let _month = '', _day = '', _year = '';
+            _year = _date.getFullYear();
+            _month = utils.switchMonthName(_date.getMonth()+1);
+            _day = utils.toFillZero(_date.getDate());
+
+            return _month + ' ' +_day + ', ' +_year
+        },
     }
 }
 </script>

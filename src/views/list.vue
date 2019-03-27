@@ -22,22 +22,23 @@
                     <p class="tip">Showing {{pageInfo.total}} results (took {{tookTime}}s)</p>
                     <div class="lists-wrap">
                         <div class="list-big-item" v-for="(messageItem, messageIndex) in messageList" :key="messageIndex" @click="goSeeDetails(messageItem)">
-                            <div class="message-left">
-                                <img src="../assets/img/message-image.jpg" alt="">
+                            <div class="message-left" v-if="messageItem.attachment.image[0]">
+                                <img :src="messageItem.attachment.image[0].url" alt="">
                             </div>
-                            <div class="message-right">
-                                <div class="h2 canchoose">Rock band Queen to open Oscars show</div>
-                                <div class="text canchoose">
-                                    The Academy of Motion Picture Arts and Sciences announced on Tuesday that would be among the performers at the Feb. 24 ceremony in Hollywood but did not say when the band would take the stage.
-                                </div>
+                            <div class="message-right" :class="messageItem.attachment.image[0]? '':'noImage'">
+                                <div class="h2 canchoose" v-if="!messageItem.highlight.title">{{messageItem.title}}</div>
+                                <div class="h2 canchoose" v-else v-html="messageItem.highlight.title[0]"></div>
+
+                                <div class="text canchoose" v-if="messageItem.highlight.content.length == 0">{{messageItem.content}}</div>
+                                <div class="text canchoose" v-else v-html="'...'+messageItem.highlight.content[0]+'...'+messageItem.highlight.content[1]+'...'"></div>
                                 <div class="bottom">
-                                    <p class="time canchoose">Feb 19, 2019 | 1010</p>
-                                    <p class="from canchoose">ABS CBN News</p>
+                                    <p class="time canchoose">{{formatTime(messageItem.nativeCreatedAt)}}</p>
+                                    <p class="from canchoose">{{messageItem.datasourceName}}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <Page v-if="pageInfo.total > pageInfo.pageSize" :total="pageInfo.total" :page-size="pageInfo.pageSize" :show-total="false" @on-change="changePageNo" class-name="pageBox"/>
+                    <Page v-if="pageInfo.total > pageInfo.pageSize" :total="pageInfo.total" :current="pageInfo.pageNo" :page-size="pageInfo.pageSize" :show-total="false" @on-change="changePageNo" class-name="pageBox"/>
                 </div>
                 <div class="left" v-else>
                     <div class="loading">
@@ -48,7 +49,7 @@
                 <!-- 筛选器 -->
                 <div class="right">
                     <div class="title">Filter by</div>
-                    <ul class="filter-wrap">
+                    <ul class="filter-wrap" v-if="!isOperating">
                         <li class="filter-type" v-for="(filterItem, filterIndex) in filterList" :key="filterIndex">
                             <div class="filter-type-title">{{filterItem.type}}</div>
                             <ul class="filter-list">
@@ -64,7 +65,7 @@
             </div>
         </div>
         
-        <my-detail v-show="isShowMessageDetail" @closeDetail="closeDetail"></my-detail>
+        <my-detail v-show="isShowMessageDetail" :chosenMessage="chosenMessage"  @closeDetail="closeDetail"></my-detail>
     </div>
 </template>
 
@@ -90,12 +91,13 @@ export default {
             suggestionList: [],
             messageList: [],
             filterList: [],
+            chosenMessage: {},
         }
     },
     mounted(){
         this.searchValue = this.$store.state.searchValue;
 
-        // this.handleParams();
+        this.goSearch(this.searchValue);
     },
     methods:{
         // 关键词建议列表
@@ -123,20 +125,28 @@ export default {
         goSearch(value){
             if(value) this.searchValue = value;
             this.suggestionList = [];
-            this.searchFacets();
+            this.isOperating = true;
+            
+            this.searchWithoutFacets().then((data)=>{
+                this.isOperating = false;
+                this.searchFacets();
+            },(err)=>{
+                this.$Message.warning(err);
+                this.isOperating = false;
+            }).catch((error)=>{
+                this.$Message.warning(error);
+                this.isOperating = false;
+            });
         },
 
         searchFacets(){
-            this.isOperating = true;
             let params = {
                 "metadata": [{ "value": this.searchValue, "class": "keyword"}],
                 "facets": ["person","org"]
             }
             this.$axios.post('search-api/v1/api/search', params).then(res=>{
-                
                 if(res.status != 200) {
                     // this.$Message.warning(res.statusText)
-                    this.isOperating = false;
                 }else{
                     this.filterList = [];
                     for(let facetsListItem in res.data.facets){
@@ -153,38 +163,41 @@ export default {
                         this.filterList.push({type:facetsListItem, list:_facetsItem})
                     }
                     console.log(this.filterList);
-                    this.searchWithoutFacets();
                 }
             })
         },
         searchWithoutFacets(){
-            let params = {
-                "metadata": [{ "value": this.searchValue, "class": "keyword"}],
-                "limit": this.pageInfo.pageSize,
-                "page": this.pageInfo.pageNo - 1,
-            }
-            // [{
-            // "value": "Pernod CEO pursues change",
-            // "class": "keyword"
-            // },{
-            //     "value": "Pernod Ricard",
-            //     "class": "org"
-            // },{
-            //     "op": 1
-            // }]
-            this.$axios.post('search-api/v1/api/search', params).then(res=>{
-                
-                if(res.status != 200) {
-                    this.$Message.warning(res.statusText);
-                    this.isOperating = false;
-                }else{
-                    this.tookTime = Number(res.data.took) / 1000;
-                    this.pageInfo.total = res.data.total;
-                    this.messageList = res.data.results;
-                    this.isOperating = false;
-                    console.log(this.messageList);
+            return new Promise((resolve, reject)=>{
+                let params = {
+                    "metadata": [{ "value": this.searchValue, "class": "keyword"}],
+                    "limit": this.pageInfo.pageSize,
+                    "page": this.pageInfo.pageNo - 1,
                 }
-            })
+                // [{
+                // "value": "Pernod CEO pursues change",
+                // "class": "keyword"
+                // },{
+                //     "value": "Pernod Ricard",
+                //     "class": "org"
+                // },{
+                //     "op": 1
+                // }]
+                this.$axios.post('search-api/v1/api/search', params).then(res=>{
+                    
+                    if(res.status != 200) {
+                        reject(res.statusText);
+                    }else{
+                        this.tookTime = Number(res.data.took) / 1000;
+                        this.messageList = res.data.results;
+                        
+                        this.pageInfo.total = res.data.total;
+                        // console.log(this.messageList);
+                        resolve();
+                    }
+                })
+                
+            });
+            
         },
 
         toggleFilter(typeIndex, filterIndex){
@@ -193,10 +206,12 @@ export default {
         },
 
         changePageNo(pageNo){
+            console.log('pageNo:'+pageNo)
             this.pageInfo.pageNo = pageNo;
             this.searchWithoutFacets();
         },
         goSeeDetails(item){
+            this.chosenMessage = item;
             this.isShowMessageDetail = true;
         },
         closeDetail(val){
@@ -211,6 +226,16 @@ export default {
             myOutput = '['+myOutput.replace(/\&/g,'{ "option": 1 }').replace(/\s+/g,"").replace(/\}\{/g,'},{') + ']';
             myOutput = JSON.parse(myOutput)
             console.log(myOutput);
+        },
+
+        formatTime(seconds){
+            let _date = new Date(seconds);
+            let _month = '', _day = '', _year = '';
+            _year = _date.getFullYear();
+            _month = utils.switchMonthName(_date.getMonth()+1);
+            _day = utils.toFillZero(_date.getDate());
+
+            return _month + ' ' +_day + ', ' +_year
         },
     }
 }

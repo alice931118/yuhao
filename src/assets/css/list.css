@@ -114,6 +114,18 @@
     height: 100px;
     position: relative;
 }
+.list-page-content .list-big-item .message-right.noImage{
+    width: 100%;
+}
+.list-page-content .list-big-item .message-right .h2{
+    width: 90%;
+    overflow: hidden;/*超出部分隐藏*/
+    white-space: nowrap;/*不换行*/
+    text-overflow: ellipsis;/*超出部分文字以...显示*/
+}
+.list-page-content .list-big-item .message-right .h2 em{
+    color: #dd4b39;
+}
 .list-page-content .list-big-item .message-right .text{
     color: #464b52;
     font-size: 13px;
@@ -122,6 +134,9 @@
     -webkit-box-orient: vertical;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+}
+.list-page-content .list-big-item .message-right .text em{
+    color: #dd4b39;
 }
 .list-page-content .list-big-item .message-right .bottom{
     position: absolute;
