@@ -120,13 +120,12 @@ export default {
             }
         },
         selectSuggestion(item){
-            this.goSearch(item);
+            this.goSearch(item.trim());
         },
 
         goSearch(value){
             if(value) this.searchValue = value;
             this.suggestionList = [];
-            this.isOperating = true;
             
             this.searchWithoutFacets().then((data)=>{
                 this.isOperating = false;
@@ -135,10 +134,10 @@ export default {
                 },2000)
                 this.searchFacets();
             },(err)=>{
-                this.$Message.warning(err);
+                if(err) this.$Message.warning(err);
                 this.isOperating = false;
             }).catch((error)=>{
-                this.$Message.warning(error);
+                if(error) this.$Message.warning(error);
                 this.isOperating = false;
             });
         },
@@ -172,36 +171,30 @@ export default {
         },
         searchWithoutFacets(){
             return new Promise((resolve, reject)=>{
-                let _metadata = [];
-                // _metadata = [{ "value": this.searchValue, "class": "keyword"}];
-                _metadata = this.HandleFilter();
-                let params = {
-                    "metadata": _metadata,
-                    "limit": this.pageInfo.pageSize,
-                    "page": this.pageInfo.pageNo - 1,
-                }
-                // [{
-                // "value": "Pernod CEO pursues change",
-                // "class": "keyword"
-                // },{
-                //     "value": "Pernod Ricard",
-                //     "class": "org"
-                // },{
-                //     "op": 1
-                // }]
-                this.$axios.post('search-api/v1/api/search', params).then(res=>{
-                    
-                    if(res.status != 200) {
-                        reject(res.statusText);
-                    }else{
-                        this.tookTime = Number(res.data.took) / 1000;
-                        this.messageList = res.data.results;
-                        
-                        this.pageInfo.total = res.data.total;
-                        // console.log(this.messageList);
-                        resolve();
+                if(this.searchValue.trim() == ''){
+                    reject()
+                }else{
+                    this.isOperating = true;
+                    let _metadata = [];
+                    _metadata = this.HandleFilter();
+                    let params = {
+                        "metadata": _metadata,
+                        "limit": this.pageInfo.pageSize,
+                        "page": this.pageInfo.pageNo - 1,
                     }
-                })
+                    this.$axios.post('search-api/v1/api/search', params).then(res=>{
+                        
+                        if(res.status != 200) {
+                            reject(res.statusText);
+                        }else{
+                            this.tookTime = Number(res.data.took) / 1000;
+                            this.messageList = res.data.results;
+                            
+                            this.pageInfo.total = res.data.total;
+                            resolve();
+                        }
+                    })
+                }
                 
             });
             
@@ -227,8 +220,6 @@ export default {
                 }
             })
             _dataList = this.handleParams(_str);
-            // console.log('_dataList=====')
-            // console.log(_dataList)
             _dataList[0].value = this.searchValue;
             return _dataList
         },
@@ -255,9 +246,6 @@ export default {
             myOutput = utils.ShuntingYard(myString, myOutput);
             myOutput = '['+myOutput.replace(/\&/g,'{ "op": 1 }').replace(/\s+/g,"").replace(/\}\{/g,'},{') + ']';
             myOutput = JSON.parse(myOutput)
-
-            // console.log('myOutput====');
-            // console.log(myOutput);
             return myOutput;
         },
 
