@@ -6,14 +6,14 @@
                 <p>Back</p>
             </div>
         </div>
-        <div class="detail-content-wrap">
+        <div class="detail-content-wrap" v-if="chosenMessage">
             <div class="detail-content">
                 <div class="tip">
                     <p class="time canchoose">{{formatTime(chosenMessage.nativeCreatedAt)}}</p>
                     <p class="from canchoose">{{chosenMessage.datasourceName}}</p>
                 </div>
                 <h1>{{chosenMessage.title}}</h1>
-                <div class="img" v-if="chosenMessage.attachment.image[0]">
+                <div class="img" v-if="chosenMessage.attachment && chosenMessage.attachment.image[0]">
                     <img :src="chosenMessage.attachment.image[0].url" alt="">
                 </div>
                 <div class="text">

@@ -72,6 +72,7 @@
 <script>
 import('../assets/css/list.css');
 import utils from '@/utils/utils';
+import { setTimeout } from 'timers';
 
 export default {
     components: {
@@ -129,6 +130,9 @@ export default {
             
             this.searchWithoutFacets().then((data)=>{
                 this.isOperating = false;
+                setTimeout(()=>{
+                    window.scrollTo(0,0);
+                },2000)
                 this.searchFacets();
             },(err)=>{
                 this.$Message.warning(err);
@@ -168,8 +172,11 @@ export default {
         },
         searchWithoutFacets(){
             return new Promise((resolve, reject)=>{
+                let _metadata = [];
+                // _metadata = [{ "value": this.searchValue, "class": "keyword"}];
+                _metadata = this.HandleFilter();
                 let params = {
-                    "metadata": [{ "value": this.searchValue, "class": "keyword"}],
+                    "metadata": _metadata,
                     "limit": this.pageInfo.pageSize,
                     "page": this.pageInfo.pageNo - 1,
                 }
@@ -203,6 +210,27 @@ export default {
         toggleFilter(typeIndex, filterIndex){
             let _ischecked = this.filterList[typeIndex].list[filterIndex].ischecked;
             this.filterList[typeIndex].list[filterIndex].ischecked = _ischecked ? !_ischecked : true;
+            this.pageInfo.pageNo = 1;
+            this.searchWithoutFacets();
+        },
+        HandleFilter(){
+            let _dataList = [];
+            let _str = '';
+            _str += JSON.stringify({"value":this.searchValue,"class":"keyword"});
+            this.filterList.forEach((typeItem)=>{
+                if(typeItem){
+                    typeItem.list.forEach((filterItem)=>{
+                        if(filterItem.ischecked){
+                            _str += '&' + JSON.stringify({'value':filterItem.name,'class': typeItem.type});
+                        }
+                    }) 
+                }
+            })
+            _dataList = this.handleParams(_str);
+            // console.log('_dataList=====')
+            // console.log(_dataList)
+            _dataList[0].value = this.searchValue;
+            return _dataList
         },
 
         changePageNo(pageNo){
@@ -218,14 +246,19 @@ export default {
             this.isShowMessageDetail = val;
         },
 
-        handleParams(){
+        handleParams(str){
             // let myString = 'O1 & O2 & O3'.replace(/\s+/g,"");
-            let myString = '{ "name" : "1", "id": 1} & { "name" : "2"} & { "name" : "3"}'.replace(/\s+/g,"");
+            // let myString = '{ "name" : "1", "id": 1} & { "name" : "2"} & { "name" : "3"}'.replace(/\s+/g,"");
+
+            let myString = str.replace(/\s+/g,"");
             let myOutput = '';
             myOutput = utils.ShuntingYard(myString, myOutput);
-            myOutput = '['+myOutput.replace(/\&/g,'{ "option": 1 }').replace(/\s+/g,"").replace(/\}\{/g,'},{') + ']';
+            myOutput = '['+myOutput.replace(/\&/g,'{ "op": 1 }').replace(/\s+/g,"").replace(/\}\{/g,'},{') + ']';
             myOutput = JSON.parse(myOutput)
-            console.log(myOutput);
+
+            // console.log('myOutput====');
+            // console.log(myOutput);
+            return myOutput;
         },
 
         formatTime(seconds){
