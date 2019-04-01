@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1 # for versions before 1.7.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: search-app
+  labels:
+    app: search-app
+    name: search-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search-app
+      name: search-app
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: search-app
+        name: search-app
+    spec:
+      containers:
+        - name: search-app
+          imagePullPolicy: Always
+          image: gcr.io/obu-fyp-yuhao/search-app:1.0.0
+          ports:
+            - containerPort: 80
+          env:
+            - name: API_URL
+              value: "123.123.123.1:8080"
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: search-app-lb
+spec:
+  type: LoadBalancer
+  selector:
+    app: search-app
+    name: search-app
+  ports:
+  - name: search-app-port
+    protocol: TCP
+    port: 80
+    targetPort: 80
