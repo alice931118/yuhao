@@ -194,4 +194,11 @@
     color: #fff;
     background-color: #464b52;
     border-radius: 2px;
- }
+}
+.list-page-content .filter-type .showMore{
+    margin: 10px 0;
+    cursor: pointer;
+}
+.list-page-content .filter-type .showMore:hover{
+    background-color: #d6d6d6; 
+}

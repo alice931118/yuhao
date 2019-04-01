@@ -15,7 +15,7 @@
                     </div>
                 </div>
             </div>
-            
+            {{pageInfo}}
             <div class="list-page-content clearfix">
                 <!-- 列表 -->
                 <div class="left" v-if="!isOperating">
@@ -53,12 +53,16 @@
                         <li class="filter-type" v-for="(filterItem, filterIndex) in filterList" :key="filterIndex">
                             <div class="filter-type-title">{{filterItem.type}}</div>
                             <ul class="filter-list">
-                                <li class="filter-list-item clearfix" v-for="(item,index) in filterItem.list" :key="index" @click="toggleFilter(filterIndex, index)" v-show="index<10">
+                                <li class="filter-list-item clearfix" v-for="(item,index) in filterItem.list" :key="index" @click="toggleFilter(filterIndex, index)" v-show="index<filterItem.showNum">
                                     <div class="icon left" :class="item.ischecked?'checked':''"></div>
                                     <div class="text left">{{item.name}}</div>
                                     <!-- <div class="num right">20</div> -->
                                 </li>
                             </ul>
+                            <div class="showMore" @click="filterItem.showNum+=10" v-show="filterItem.list.length > filterItem.showNum">
+                                <Icon type="ios-more" size="24" />
+                                <span>{{filterItem.list.length - filterItem.showNum}}</span>
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -81,6 +85,7 @@ export default {
     data(){
         return{
             isOperating: false,
+            isNeedFacets: false,
             isShowMessageDetail: false,
             searchValue: '',
             pageInfo:{
@@ -96,9 +101,17 @@ export default {
         }
     },
     mounted(){
+        console.log('this.$store.state.searchValue='+this.$store.state.searchValue);
         this.searchValue = this.$store.state.searchValue;
+        this.isNeedFacets = Number(this.$route.query.isNeedFacets) == 1 ? true : false;
+        this.pageInfo.pageNo = Number(this.$route.query.pageNo);
 
-        this.goSearch(this.searchValue);
+        if(this.isNeedFacets){ 
+            this.goSearch(this.searchValue); 
+        }else{
+            this.filterList = this.$store.state.filterList;
+            this.searchWithoutFacets(1);
+        }
     },
     methods:{
         // 关键词建议列表
@@ -123,12 +136,12 @@ export default {
             this.goSearch(item.trim());
         },
 
+        // 第一次搜索
         goSearch(value){
             if(value) this.searchValue = value;
             this.suggestionList = [];
             
             this.searchWithoutFacets().then((data)=>{
-                this.isOperating = false;
                 setTimeout(()=>{
                     window.scrollTo(0,0);
                 },2000)
@@ -141,7 +154,7 @@ export default {
                 this.isOperating = false;
             });
         },
-
+        // 搜索filters
         searchFacets(){
             let params = {
                 "metadata": [{ "value": this.searchValue, "class": "keyword"}],
@@ -156,20 +169,21 @@ export default {
                         let _facetsItem = [];
                         
                         res.data.facets[facetsListItem].forEach((item,index) => {
-                            if(index<10){
-                                _facetsItem.push({
-                                    name: item,
-                                    ischecked: false
-                                })
-                            }
+                            _facetsItem.push({
+                                name: item,
+                                ischecked: false
+                            })
                         })
-                        this.filterList.push({type:facetsListItem, list:_facetsItem})
+                        this.filterList.push({type:facetsListItem, list:_facetsItem, showNum: 10})
                     }
                     console.log(this.filterList);
+                    this.$store.commit('updateFilterList', this.filterList );
                 }
+                this.isOperating = false;
             })
         },
-        searchWithoutFacets(){
+        // 搜索结果
+        searchWithoutFacets(isWithoutFacets){
             return new Promise((resolve, reject)=>{
                 if(this.searchValue.trim() == ''){
                     reject()
@@ -193,6 +207,7 @@ export default {
                             this.pageInfo.total = res.data.total;
                             resolve();
                         }
+                        if(isWithoutFacets == 1) this.isOperating = false;
                     })
                 }
                 
@@ -200,11 +215,13 @@ export default {
             
         },
 
+        // filters点击选中/反选
         toggleFilter(typeIndex, filterIndex){
             let _ischecked = this.filterList[typeIndex].list[filterIndex].ischecked;
             this.filterList[typeIndex].list[filterIndex].ischecked = _ischecked ? !_ischecked : true;
             this.pageInfo.pageNo = 1;
-            this.searchWithoutFacets();
+            this.$store.commit('updateFilterList', this.filterList );
+            this.searchWithoutFacets(1);
         },
         HandleFilter(){
             let _dataList = [];
@@ -227,8 +244,15 @@ export default {
         changePageNo(pageNo){
             console.log('pageNo:'+pageNo)
             this.pageInfo.pageNo = pageNo;
-            this.searchWithoutFacets();
+            this.searchWithoutFacets(1);
+
+            // console.log('this.searchValue = '+this.searchValue)
+            // this.$store.commit('updateSearchValue', this.searchValue );
+            // this.$router.push('/list?pageNo='+ this.pageInfo.pageNo +'&isNeedFacets=0');
+            // location.reload();
         },
+
+        // 文章详情
         goSeeDetails(item){
             this.chosenMessage = item;
             this.isShowMessageDetail = true;
@@ -237,18 +261,22 @@ export default {
             this.isShowMessageDetail = val;
         },
 
+        // 处理请求体
         handleParams(str){
             // let myString = 'O1 & O2 & O3'.replace(/\s+/g,"");
             // let myString = '{ "name" : "1", "id": 1} & { "name" : "2"} & { "name" : "3"}'.replace(/\s+/g,"");
 
-            let myString = str.replace(/\s+/g,"");
+            // let myString = str.replace(/\s+/g,"");
+            let myString = str;
             let myOutput = '';
             myOutput = utils.ShuntingYard(myString, myOutput);
-            myOutput = '['+myOutput.replace(/\&/g,'{ "op": 1 }').replace(/\s+/g,"").replace(/\}\{/g,'},{') + ']';
+            // myOutput = '['+myOutput.replace(/\&/g,'{ "op": 1 }').replace(/\s+/g,"").replace(/\}\{/g,'},{') + ']';
+            myOutput = '['+myOutput.replace(/\&/g,'{ "op": 1 }').replace(/\}\{/g,'},{') + ']';
             myOutput = JSON.parse(myOutput)
             return myOutput;
         },
 
+        // 时间格式化
         formatTime(seconds){
             let _date = new Date(seconds);
             let _month = '', _day = '', _year = '';

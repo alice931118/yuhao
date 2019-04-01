@@ -5,7 +5,7 @@
     <div class="search-wrap">
       <div class="logo">Enterprise-search</div>
       <div class="search-box" @click.stop="1">
-        <Input v-model="searchValue"  icon="ios-search-outline" @input="querySuggestions"/>
+        <Input v-model="searchValue"  icon="ios-search-outline" @input="querySuggestions" @on-enter="goSearch()"/>
         <div class="search-suggestion" v-if="suggestionList.length > 0">
           <div class="search-suggestion-item" v-for="(item,index) in suggestionList" :key="index" @click.stop="selectSuggestion(item)">{{item}}</div>
         </div>
@@ -35,7 +35,7 @@ export default {
     goSearch(value){
       if(value) this.searchValue = value;
       this.$store.commit('updateSearchValue', this.searchValue );
-      this.$router.push('/list');
+      this.$router.push('/list?pageNo=1&isNeedFacets=1');
     },
 
     selectSuggestion(item){
