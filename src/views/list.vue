@@ -15,7 +15,7 @@
                     </div>
                 </div>
             </div>
-            {{pageInfo}}
+            
             <div class="list-page-content clearfix">
                 <!-- 列表 -->
                 <div class="left" v-if="!isOperating">
@@ -103,7 +103,7 @@ export default {
     },
     mounted(){
         window.addEventListener("popstate", ()=>{
-            console.log(111);
+            this.isShowMessageDetail = false;
             this.searchInit(1);
         }, false)
 
@@ -231,7 +231,7 @@ export default {
             let _ischecked = this.filterList[typeIndex].list[filterIndex].ischecked;
             this.filterList[typeIndex].list[filterIndex].ischecked = _ischecked ? !_ischecked : true;
             this.pageInfo.pageNo = 1;
-            // this.$store.commit('updateFilterList', this.filterList );
+            this.$router.push('/list?searchValue='+ this.searchValue +'&pageNo=1&isNeedFacets=0');
             sessionStorage.setItem('filterList', JSON.stringify(this.filterList) );
             this.searchWithoutFacets(1);
         },
