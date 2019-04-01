@@ -7,7 +7,7 @@ switch (process.env.VUE_APP_ENV_ALIAS) {
     case 'test':
         urlParams.baseUrl = "https://35.198.235.4:8080/"
         break
-    case 'tobetio':
+    case 'production':
         urlParams.baseUrl = "https://35.198.235.4:8080/"
         break
     default:
