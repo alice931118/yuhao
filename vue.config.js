@@ -10,16 +10,7 @@ module.exports = {
                 '^/localApi': '/'  // 替换target中的请求地址，也就是说，在请求的时候，url用'/proxy'代替'http://ip.taobao.com'
             }
         },
-        '/testApi': { 
-          target: process.env.API_URL || 'http://35.198.235.4:8080/',
-          logLevel: 'debug'
-        },
-        '/prodApi': { 
-          target: process.env.API_URL || 'http://35.198.235.4:8080/',
-          logLevel: 'debug'
-        }
-
-    }, 
+    },
   }
 };
 
