@@ -38,7 +38,6 @@ export default {
     },
     methods:{
         goBack(){
-            console.log(32)
             this.$emit('closeDetail',false)
         },
 

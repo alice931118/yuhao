@@ -34,8 +34,9 @@ export default {
   methods:{
     goSearch(value){
       if(value) this.searchValue = value;
-      this.$store.commit('updateSearchValue', this.searchValue );
-      this.$router.push('/list?pageNo=1&isNeedFacets=1');
+      // this.$store.commit('updateSearchValue', this.searchValue);
+      // sessionStorage.setItem('searchValue', this.searchValue);
+      this.$router.push('/list?searchValue='+ this.searchValue +'&pageNo=1&isNeedFacets=1');
     },
 
     selectSuggestion(item){

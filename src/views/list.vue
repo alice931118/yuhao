@@ -79,6 +79,7 @@ import utils from '@/utils/utils';
 import { setTimeout } from 'timers';
 
 export default {
+    inject: ['reload'],
     components: {
         myDetail: require('@/views/detail').default,
     },
@@ -101,19 +102,28 @@ export default {
         }
     },
     mounted(){
-        console.log('this.$store.state.searchValue='+this.$store.state.searchValue);
-        this.searchValue = this.$store.state.searchValue;
-        this.isNeedFacets = Number(this.$route.query.isNeedFacets) == 1 ? true : false;
-        this.pageInfo.pageNo = Number(this.$route.query.pageNo);
+        window.addEventListener("popstate", ()=>{
+            console.log(111);
+            this.searchInit(1);
+        }, false)
 
-        if(this.isNeedFacets){ 
-            this.goSearch(this.searchValue); 
-        }else{
-            this.filterList = this.$store.state.filterList;
-            this.searchWithoutFacets(1);
-        }
+        this.searchInit();
     },
     methods:{
+
+        searchInit(isNeedFacets){
+            this.searchValue = this.$route.query.searchValue ? this.$route.query.searchValue : '';
+            this.isNeedFacets = isNeedFacets == 1 ? false : (Number(this.$route.query.isNeedFacets) == 1 ? true : false);
+            this.pageInfo.pageNo = this.$route.query.pageNo ? Number(this.$route.query.pageNo) : 1;
+
+            if(this.isNeedFacets){ 
+                this.goSearch(this.searchValue); 
+            }else{
+                this.filterList = JSON.parse(sessionStorage.getItem('filterList'));
+                this.searchWithoutFacets(1);
+            }
+        },
+
         // 关键词建议列表
         querySuggestions(){
             if(this.searchValue == ""){
@@ -177,7 +187,8 @@ export default {
                         this.filterList.push({type:facetsListItem, list:_facetsItem, showNum: 10})
                     }
                     console.log(this.filterList);
-                    this.$store.commit('updateFilterList', this.filterList );
+                    // this.$store.commit('updateFilterList', this.filterList );
+                    sessionStorage.setItem('filterList', JSON.stringify(this.filterList));
                 }
                 this.isOperating = false;
             })
@@ -220,7 +231,8 @@ export default {
             let _ischecked = this.filterList[typeIndex].list[filterIndex].ischecked;
             this.filterList[typeIndex].list[filterIndex].ischecked = _ischecked ? !_ischecked : true;
             this.pageInfo.pageNo = 1;
-            this.$store.commit('updateFilterList', this.filterList );
+            // this.$store.commit('updateFilterList', this.filterList );
+            sessionStorage.setItem('filterList', JSON.stringify(this.filterList) );
             this.searchWithoutFacets(1);
         },
         HandleFilter(){
@@ -245,11 +257,7 @@ export default {
             console.log('pageNo:'+pageNo)
             this.pageInfo.pageNo = pageNo;
             this.searchWithoutFacets(1);
-
-            // console.log('this.searchValue = '+this.searchValue)
-            // this.$store.commit('updateSearchValue', this.searchValue );
-            // this.$router.push('/list?pageNo='+ this.pageInfo.pageNo +'&isNeedFacets=0');
-            // location.reload();
+            this.$router.push('/list?searchValue='+ this.searchValue +'&pageNo='+ this.pageInfo.pageNo +'&isNeedFacets=0');
         },
 
         // 文章详情
