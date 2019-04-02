@@ -8,8 +8,7 @@ constant.env = process.env;
 constant.url = urlParams;
 
 
-// axios.defaults.baseURL = urlParams.baseUrl;
-axios.defaults.baseURL = Vue.$env.get('SERVER');
+axios.defaults.baseURL = urlParams.baseUrl;
 // console.log(axios.defaults.baseURL)
 
 axios.defaults.withCredentials = true;
