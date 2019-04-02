@@ -16,6 +16,9 @@ Vue.prototype.$publicPath = process.env.BASE_URL;
 // Start support for ENV vars
 let CONFIG = !!window.CONFIG ? window.CONFIG : process.env
 function getConfig(k, dfl) {
+    console.log(k)
+    console.log(dfl)
+    console.log(CONFIG)
     if (CONFIG[k]) {
         return CONFIG[k]
     } else if (CONFIG['VUE_APP_'+k]) {
