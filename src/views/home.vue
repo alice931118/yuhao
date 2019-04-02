@@ -29,9 +29,7 @@ export default {
     }
   },
   mounted(){
-    // console.log('REST_SERVER:'+this.$env.get('REST_SERVER'))
-    // console.info(process.env.SERVER);
-    this.$axios.defaults.baseURL = this.$env.get('REST_SERVER');
+    
   },
   methods:{
     goSearch(value){
