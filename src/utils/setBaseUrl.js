@@ -5,10 +5,10 @@ let urlParams = {
 console.log('process.env.VUE_APP_ENV_ALIAS:'+process.env.VUE_APP_ENV_ALIAS);
 switch (process.env.VUE_APP_ENV_ALIAS) {
     case 'test':
-        urlParams.baseUrl = "http://35.198.235.4:8080/api/"
+        urlParams.baseUrl = "/api"
         break
     case 'production':
-        urlParams.baseUrl = "http://35.198.235.4:8080/api/"
+        urlParams.baseUrl = "/api"
         break
     default:
         urlParams.baseUrl = '/localApi'
