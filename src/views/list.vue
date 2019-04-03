@@ -2,7 +2,7 @@
     <div class="list-page" @click="suggestionList=[]">
         <div class="messageList" v-show="!isShowMessageDetail">
             <div class="list-header">
-                <div class="left">
+                <div class="left" @click="goHome()">
                     <Icon class="icon" type="ios-ionitron-outline" size="24" />
                     <div class="logo">Enterprise-search</div>
                 </div>
@@ -293,6 +293,10 @@ export default {
             _day = utils.toFillZero(_date.getDate());
 
             return _month + ' ' +_day + ', ' +_year
+        },
+
+        goHome(){
+            this.$router.push('/home');
         },
     }
 }
